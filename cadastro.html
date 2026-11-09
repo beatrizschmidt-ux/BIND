@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIND – Cadastro</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="tela">
+  <a class="voltar" href="index.html" aria-label="Voltar">←</a>
+  <div class="logo" data-logo></div>
+  <h1>Cadastro</h1>
+  <p>Informe seus dados para receber ajuda em caso de emergência.</p>
+  <form id="form" style="width:100%" novalidate>
+    <label class="campo"><span>👤</span><input id="nome" placeholder="Nome da pessoa" autocomplete="name" required></label>
+    <label class="campo"><span>🪪</span><input id="cpf" placeholder="CPF" inputmode="numeric" maxlength="14"></label>
+    <label class="campo"><span>🧑‍🤝‍🧑</span><input id="contato-nome" placeholder="Nome do contato de confiança" required></label>
+    <label class="campo"><span>✉️</span><input id="contato-email" type="email" placeholder="E-mail do contato" required></label>
+    <p class="msg-erro" id="erro" role="alert"></p>
+    <button class="btn laranja" type="submit">💾 Salvar</button>
+  </form>
+</main>
+<script src="app.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  // Se já houver dados, preenche o formulário
+  const u = DB.usuario(), c = DB.contatos()[0];
+  if(u){ $("nome").value = u.nome; $("cpf").value = u.cpf || ""; }
+  if(c){ $("contato-nome").value = c.nome; $("contato-email").value = c.email; }
+
+  $("cpf").addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"").slice(0,11);
+    e.target.value = v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+  });
+
+  $("form").addEventListener("submit", e => {
+    e.preventDefault();
+    const nome = $("nome").value.trim(), cn = $("contato-nome").value.trim(), ce = $("contato-email").value.trim();
+    if(!nome || !cn) return $("erro").textContent = "Preencha seu nome e o nome do contato.";
+    if(!emailValido(ce)) return $("erro").textContent = "Digite um e-mail válido para o contato.";
+    DB.set("bind_usuario", { nome, cpf: $("cpf").value });
+    const lista = DB.contatos(); lista[0] = { nome: cn, email: ce };
+    DB.set("bind_contatos", lista);
+    location.href = "sos.html";
+  });
+</script></body></html>

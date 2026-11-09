@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIND – Ajuda a caminho</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="tela">
+  <div class="icone-grande">📍🚗</div>
+  <h1>Ajuda a caminho!</h1>
+  <p>Uma mensagem foi enviada para o contato cadastrado.</p>
+  <div class="caixa">📍 Sua localização está sendo compartilhada.</div>
+  <p class="msg-erro" id="erro" role="alert"></p>
+  <button class="btn" id="ok">✓ Estou bem</button>
+</main>
+<script src="app.js"></script>
+<script>
+  exigeCadastro();
+  const ok = document.getElementById("ok");
+  ok.addEventListener("click", async () => {
+    ok.disabled = true; ok.textContent = "Avisando…";
+    try{
+      await enviarEmail(MENSAGENS.ASSUNTO_OK, MENSAGENS.MENSAGEM_OK);
+      localStorage.removeItem("bind_alerta_ativo");
+      location.href = "sos.html";
+    }catch(e){
+      ok.disabled = false; ok.textContent = "✓ Estou bem";
+      document.getElementById("erro").textContent = "Não foi possível enviar o aviso. Tente novamente.";
+    }
+  });
+</script></body></html>

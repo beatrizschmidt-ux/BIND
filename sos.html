@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIND – S.O.S</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="tela" style="background:linear-gradient(#fff6ef,#fff)">
+  <a class="voltar" href="configuracoes.html" aria-label="Configurações">⚙</a>
+  <div class="sino">🔔</div>
+  <div class="sos-area"><button class="sos" id="sos" aria-label="Botão S.O.S – clique duas vezes"><small>⚠</small>S.O.S</button></div>
+  <h2>Clique duas vezes<br>no botão para pedir ajuda!</h2>
+  <p class="msg-erro" id="erro" role="alert"></p>
+  <p style="font-size:2rem">👆</p>
+</main>
+<script src="app.js"></script>
+<script>
+  exigeCadastro();
+  const btn = document.getElementById("sos"), erro = document.getElementById("erro");
+  let ultimo = 0;
+
+  // Detecta duplo clique / duplo toque (intervalo máximo de 450 ms)
+  btn.addEventListener("click", () => {
+    const agora = Date.now();
+    if(agora - ultimo < 450){ ultimo = 0; acionar(); } else { ultimo = agora; erro.textContent = "Toque mais uma vez para confirmar."; }
+  });
+
+  async function acionar(){
+    btn.classList.add("enviando"); erro.textContent = "Enviando alerta…";
+    const mapa = await pegarLocalizacao();
+    try{
+      await enviarEmail(MENSAGENS.ASSUNTO_SOS, MENSAGENS.MENSAGEM_SOS, mapa);
+      DB.set("bind_alerta_ativo", true);
+      location.href = "alerta.html";
+    }catch(e){
+      btn.classList.remove("enviando");
+      erro.textContent = "Não foi possível enviar. Verifique a internet e as chaves do EmailJS em app.js.";
+      console.error(e);
+    }
+  }
+</script></body></html>

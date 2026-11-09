@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIND</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="tela" style="justify-content:center">
+  <div class="logo" data-logo></div>
+  <h1>Sua segurança<br>em primeiro lugar</h1>
+  <p style="font-size:1.6rem">♡</p>
+  <a class="btn laranja" id="entrar" href="cadastro.html">Começar</a>
+</main>
+<script src="app.js"></script>
+<script>
+  // Já cadastrado? Vai direto para o botão S.O.S.
+  if(DB.usuario() && DB.contatos().length) document.getElementById("entrar").href = "sos.html";
+</script></body></html>

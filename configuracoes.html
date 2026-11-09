@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIND – Configurações</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="tela cfg">
+  <a class="voltar" href="sos.html" aria-label="Voltar">←</a>
+  <h2 style="text-align:center;position:absolute;top:28px;left:0;right:0">Configurações</h2>
+  <h2>👥 Seus contatos de confiança</h2>
+  <div id="lista"></div>
+  <button class="btn" id="abrir" style="margin-top:4px">＋ Adicionar contato</button>
+  <form id="form-add" novalidate>
+    <label class="campo"><span>👤</span><input id="n" placeholder="Nome do contato"></label>
+    <label class="campo"><span>✉️</span><input id="e" type="email" placeholder="E-mail do contato"></label>
+    <p class="msg-erro" id="erro" role="alert"></p>
+    <button class="btn laranja" type="submit" style="margin-top:4px">Salvar contato</button>
+  </form>
+  <a class="item" href="privacidade.html">🔒 Privacidade <b>›</b></a>
+  <a class="item" href="sobre.html">ℹ️ Sobre o aplicativo <b>›</b></a>
+  <a class="item" href="central-ajuda.html">❓ Ajuda <b>›</b></a>
+  <button class="btn" id="sair">↪ Sair</button>
+</main>
+<script src="app.js"></script>
+<script>
+  exigeCadastro();
+  const $ = id => document.getElementById(id);
+  const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  function desenhar(){
+    $("lista").innerHTML = DB.contatos().map((c,i) =>
+      `<div class="contato"><span>👤</span><div><strong>${esc(c.nome)}</strong><br>${esc(c.email)}</div>
+       <button data-i="${i}" aria-label="Remover ${esc(c.nome)}">🗑</button></div>`).join("");
+  }
+  $("lista").addEventListener("click", e => {
+    const b = e.target.closest("button[data-i]"); if(!b) return;
+    const l = DB.contatos(); if(l.length === 1) return alert("Mantenha ao menos um contato de confiança.");
+    l.splice(+b.dataset.i, 1); DB.set("bind_contatos", l); desenhar();
+  });
+  $("abrir").addEventListener("click", () => { $("form-add").style.display = "block"; $("n").focus(); });
+  $("form-add").addEventListener("submit", e => {
+    e.preventDefault();
+    const nome = $("n").value.trim(), email = $("e").value.trim();
+    if(!nome || !emailValido(email)) return $("erro").textContent = "Informe o nome e um e-mail válido.";
+    DB.set("bind_contatos", [...DB.contatos(), { nome, email }]);
+    e.target.reset(); e.target.style.display = "none"; $("erro").textContent = ""; desenhar();
+  });
+  $("sair").addEventListener("click", () => {
+    if(confirm("Sair apaga os dados salvos neste aparelho. Continuar?")){ DB.limpar(); location.href = "index.html"; }
+  });
+  desenhar();
+</script></body></html>
